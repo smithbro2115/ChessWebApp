@@ -10,16 +10,29 @@
 </head>
 <body>
     <h1 class="center">Chess home!</h1>
-    <div id="board1" style="width: 70%;"></div>
-    <button style="margin: 1%;" class="getPosition" onclick="clickGetPosition()">Get Position</button>
-    <button style="margin: 1%;" class="setPosition" onclick="setToRuyLopez()">Set Position To Ruy Lopez</button>
-    <button style="margin: 1%;" class="start" onclick="setToStart()">Set Position To Start</button>
+    <div class="center" id="board1" style="width: 45%;"></div>
+    <div class="buttons center">
+        <button style="margin: 1%;" class="getPosition" onclick="clickGetPosition()">Get Position</button>
+        <button style="margin: 1%;" class="setPosition" onclick="setToRuyLopez()">Set Position To Ruy Lopez</button>
+        <button style="margin: 1%;" class="start" onclick="setToStart()">Set Position To Start</button>
+    </div>
 </body>
+    <script>
+        var MovePieceURL = "{% url 'chess-move-piece' %}";
+    </script>
+    <script>
+      function onDrop (source, target, piece, newPos, oldPos, orientation) {
+          var data = {'source': source, 'target': target, 'piece': piece, 'newPos': newPos, 'oldPos': oldPos,
+          'orientation': orientation};
+          $.post(MovePieceURL, data, function(response){console.log('HEY!');});
+      }
+</script>
     <script>
         var config = {
           position: "start",
           draggable: true,
-          pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png"
+          pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
+          onDrop: onDrop
           }
         var board1 = Chessboard('board1', config)
         function clickGetPosition(){
