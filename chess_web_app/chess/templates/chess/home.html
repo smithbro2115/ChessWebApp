@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src=https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js></script>
+    <script src="/static/js/chessboard-1.0.0.min.js"></script>
+    <link rel="stylesheet" href="/static/css/base.css"/>
+    <link rel="stylesheet" href="/static/css/chessboard-1.0.0.min.css">
+    <title></title>
+</head>
+<body>
+    <h1 class="center">Chess home!</h1>
+    <div id="board1" style="width: 70%;"></div>
+    <button style="margin: 1%;" class="getPosition" onclick="clickGetPosition()">Get Position</button>
+    <button style="margin: 1%;" class="setPosition" onclick="setToRuyLopez()">Set Position To Ruy Lopez</button>
+    <button style="margin: 1%;" class="start" onclick="setToStart()">Set Position To Start</button>
+</body>
+    <script>
+        var config = {
+          position: "start",
+          draggable: true,
+          pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png"
+          }
+        var board1 = Chessboard('board1', config)
+        function clickGetPosition(){
+          console.log('Current position as an Object:')
+          console.log(board1.position())
+
+          console.log('Current position as a FEN string:')
+          console.log(board1.fen())
+        }
+        function setToRuyLopez(){
+        board1.position('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R')
+        }
+        function setToStart(){
+        board1.start()
+        }
+    </script>
+</html>
