@@ -2,6 +2,9 @@
 import chess
 
 
+games = {}
+
+
 class Game:
     """Chess Game"""
     def __init__(self, game_id):

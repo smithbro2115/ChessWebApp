@@ -19,25 +19,41 @@
 </body>
     <script>
         var MovePieceURL = "{% url 'chess-move-piece' %}";
+        var GameStartURL = "{% url 'chess-start-game' %}";
+
     </script>
     <script>
-      function onDrop (source, target, piece, newPos, oldPos, orientation) {
+      function onDrop (source, target, piece, newPos, oldPos, orientation, game_id) {
           $.post(MovePieceURL, {'newPos': Chessboard.objToFen(newPos), 'oldPos': Chessboard.objToFen(oldPos),
-          'source': source, 'target': target},
+          'source': source, 'target': target, 'game_id': game_id},
            function(response){console.log('HEY!');});
       }
+
+      function gameStart(game_id){
+        $.post(GameStartURL, {'game_id': game_id}, function(response){console.log('Started Chess Game: ' + game_id);});
+       }
 </script>
     <script>
+        function getConfig(game_id){
         config = {
           position: "start",
           draggable: true,
           pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
-          onDrop: onDrop}
+          onDrop: function(source, target, piece, newPos, oldPos, orientation){
+            onDrop(source, target, piece, newPos, oldPos, orientation, game_id)}
+            }
+          return config
+         }
 
         class ChessBoard extends Chessboard{
             constructor(div_tag, game_id){
-                super(div_tag, config);
+                super(div_tag, getConfig(game_id));
                 this.game_id = game_id
+                gameStart(this.game_id)
+            }
+
+            position(move_one){
+                console.log(move_one);
             }
         }
 
