@@ -21,26 +21,27 @@
         var MovePieceURL = "{% url 'chess-move-piece' %}";
     </script>
     <script>
-      function onDrop (source, target, piece, newPos, oldPos, orientation, board) {
-          $.post(MovePieceURL, {'newPos': board1.fen()}, function(response){console.log('HEY!');});
+      function onDrop (source, target, piece, newPos, oldPos, orientation) {
+          $.post(MovePieceURL, {'newPos': Chessboard.objToFen(newPos), 'oldPos': Chessboard.objToFen(oldPos),
+          'source': source, 'target': target},
+           function(response){console.log('HEY!');});
       }
 </script>
     <script>
-        class ChessBoardLocal{
-            constructor(board_div_tag){
-                var config = {
-                  position: "start",
-                  draggable: true,
-                  pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
-                  onDrop: this.onDrop}
-                this.board = Chessboard(board_div_tag, config)
-            }
+        config = {
+          position: "start",
+          draggable: true,
+          pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
+          onDrop: onDrop}
 
-            onDrop(source, target, piece, newPos, oldPos, orientation){
-                $.post(MovePieceURL, {'newPos': this.board.fen()}, function(response){console.log('HEY!');});
+        class ChessBoard extends Chessboard{
+            constructor(div_tag, game_id){
+                super(div_tag, config);
+                this.game_id = game_id
             }
         }
-        var board1 = new ChessBoardLocal('board1')
+
+        var board1 = new ChessBoard('board1', 'game_one')
         function clickGetPosition(){
           console.log('Current position as an Object:')
           console.log(board1.position())
