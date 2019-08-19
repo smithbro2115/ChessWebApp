@@ -1,4 +1,41 @@
+body{
+    background-color: #312e2b;
+}
+
+h1{
+color: white;
+}
+
 .center{
+    position: static;
     margin: auto;
     text-align: center;
+}
+
+.right{
+    position: absolute;
+    right: 2%;
+    margin: auto;
+}
+
+.sidebar-indicator-background{
+    vertical-align: middle;
+    color: white;
+    line-height: 3.8em;
+    height: 10%;
+    background-color: #272522;
+    padding: 0 10px 0 10px;
+}
+
+.text-align-middle{
+    position: absolute;
+    top: 50%;
+}
+
+.sidebar{
+    width: 300px;
+    top: 12%;
+    bottom: 17%;
+    border-radius: 5px;
+    background-color: #ffffff;
 }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<script src=https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js></script>
+	<script src="/static/js/chessboard-1.0.0.min.js"></script>
+	<link rel="stylesheet" href="/static/css/base.css"/>
+	<link rel="stylesheet" href="/static/css/chessboard-1.0.0.min.css">
+	<title></title>
+</head>
+<body>
+	<h1 class="center">Chess home!</h1>
+	<div class="center" id="board1" style="width: 45%;"></div>
+	<div class="buttons center">
+		<button style="margin: 1%;" class="getPosition" onclick="clickGetPosition()">Get Position</button>
+		<button style="margin: 1%;" class="setPosition" onclick="setToRuyLopez()">Set Position To Ruy Lopez</button>
+		<button style="margin: 1%;" class="start" onclick="setToStart()">Set Position To Start</button>
+	</div>
+	<div class="sidebar right">
+		<div class='center'><h2 class='username'></h2><h2> vs. </h2><h2 class='oppenents-username'><h2></div>
+		<div class="sidebar-indicator-background"><b><p id='sidebar-indicator-text'>White to move</p></b></div>
+	</div>
+</body>
+	<script>
+		var MovePieceURL = "{% url 'chess-app-move-piece' %}";
+		var DragPieceURL = "{% url 'chess-app-drag-piece' %}";
+		var GameStartURL = "{% url 'chess-app-start-game' %}";
+
+	</script>
+	<script>
+	  games = {}
+	  function onDrop (source, target, piece, newPos, oldPos, orientation, game_id) {
+		  engine_response = null
+		  $.ajax({
+				  type: 'POST',
+				  url: MovePieceURL,
+				  data: {'newPos': Chessboard.objToFen(newPos), 'oldPos': Chessboard.objToFen(oldPos), 'source': source,
+				   'target': target, 'game_id': game_id},
+				  success: function(response){engine_response = response},
+				  async: false
+				  });
+			console.log(engine_response)
+		  if (!engine_response['valid']){
+			return 'snapback'
+		  }
+		  updateBoard(game_id, engine_response, newPos);
+		}
+
+	function updateBoard(game_id, response, new_board_pos){
+		game = games[game_id]
+		board_fen = Chessboard.objToFen(new_board_pos)
+		fen = response['fen']
+		$("#sidebar-indicator-text").text(getColorFromBool(response['color']) + ' to move')
+		if(!fen.startsWith(board_fen)){
+			console.log(board_fen)
+			console.log(fen)
+			game.position(fen, false)
+		}
+		if(response['is_checkmate']){
+			checkmate(game, response['color'])
+		}
+	}
+	
+	
+	function getColorFromBool(color_bool){if (color_bool){return "White"} else{return "Black"}}
+	
+	
+	function checkmate(game, player){
+		console.log('Checkmate!')
+		var winning_player = getColorFromBool(!player)
+		$("#sidebar-indicator-text").text('Checkmate! ' + winning_player + ' wins!')
+	}
+
+
+	function onDragStart (source, piece, pos, orientation, game_id) {
+	  engine_response = null
+	  $.ajax({
+		  type: 'POST',
+		  url: DragPieceURL,
+		  data: {'source': source, 'piece': piece, 'orientation': orientation, 'pos': pos, 'game_id': game_id},
+		  success: function(response){engine_response = response},
+		  async: false
+		  });
+	  if (engine_response === 'False'){
+		return false
+	  }
+	}
+
+	  function gameStart(game_id, game){
+		games[game_id] = game
+		$.post(GameStartURL, {'game_id': game_id}, function(response){console.log('Started Chess Game: ' + game_id);});
+	   }
+</script>
+	<script>
+		function getConfig(game_id){
+		config = {
+		  position: "start",
+		  draggable: true,
+		  pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
+		  onDrop: function(source, target, piece, newPos, oldPos, orientation){
+			return onDrop(source, target, piece, newPos, oldPos, orientation, game_id)},
+		  onDragStart: function(source, piece, pos, orientation){
+			return onDragStart(source, piece, pos, orientation, game_id)}
+		  }
+		  return config
+		 }
+
+		class ChessBoard extends Chessboard{
+			constructor(div_tag, game_id){
+				super(div_tag, getConfig(game_id));
+				this.game_id = game_id
+				gameStart(this.game_id, this)
+			}
+		}
+
+		var board1 = new ChessBoard('board1', 'game_one')
+		function clickGetPosition(){
+		  console.log('Current position as an Object:')
+		  console.log(board1.position())
+
+		  console.log('Current position as a FEN string:')
+		  console.log(board1.fen())
+		}
+		function setToRuyLopez(){
+		board1.position('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R')
+		}
+		function setToStart(){
+		board1.start()
+		}
+	</script>
+</html>

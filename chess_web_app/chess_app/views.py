@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from chess_web_app.chess.chess_engine.main import games, Game
+from .chess_engine.main import Game, games
 
 
 def home(request):
@@ -15,9 +15,19 @@ def move_piece(request):
             source = request.POST['source']
             target = request.POST['target']
             game_id = request.POST['game_id']
-            print(f"{source}{target}", game_id)
-            return HttpResponse('success')
-    return HttpResponse('FAIL!!!!!')
+            data = games[game_id].start_move(source, target)
+            return JsonResponse(data)
+    return HttpResponse('fail')
+
+
+@csrf_exempt
+def drag_piece(request):
+    if request.method == 'POST':
+        if 'source' in request.POST:
+            source = request.POST['source']
+            game_id = request.POST['game_id']
+            return HttpResponse(games[game_id].check_if_right_color(source))
+    return HttpResponse('fail')
 
 
 @csrf_exempt
@@ -28,4 +38,4 @@ def start_game(request):
             game = Game(game_id)
             games[game_id] = game
             return HttpResponse('success')
-    return HttpResponse('FAIL!!!!!')
+    return HttpResponse('fail')
