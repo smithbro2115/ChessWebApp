@@ -39,3 +39,13 @@ def start_game(request):
             games[game_id] = game
             return HttpResponse('success')
     return HttpResponse('fail')
+
+
+@csrf_exempt
+def stop_game(request):
+    if request.method == 'POST':
+        if 'game_id' in request.POST:
+            game_id = request.POST['game_id']
+            games.pop(game_id)
+            return HttpResponse('success')
+    return HttpResponse('fail')

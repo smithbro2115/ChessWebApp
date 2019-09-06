@@ -51,6 +51,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'chess_web_app.urls'
+ASGI_APPLICATION = "chess_web_app.routing.application"
+
 
 TEMPLATES = [
     {
@@ -68,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'chess_web_app.wsgi.application'
+# WSGI_APPLICATION = 'chess_web_app.wsgi.application'
 
 
 # Database

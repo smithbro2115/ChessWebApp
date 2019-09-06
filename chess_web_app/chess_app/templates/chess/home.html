@@ -12,9 +12,7 @@
 	<h1 class="center">Chess home!</h1>
 	<div class="center" id="board1" style="width: 45%;"></div>
 	<div class="buttons center">
-		<button style="margin: 1%;" class="getPosition" onclick="clickGetPosition()">Get Position</button>
-		<button style="margin: 1%;" class="setPosition" onclick="setToRuyLopez()">Set Position To Ruy Lopez</button>
-		<button style="margin: 1%;" class="start" onclick="setToStart()">Set Position To Start</button>
+		<button style="margin: 1%;" class="restart" onclick="setToStart()">Reset</button>
 	</div>
 	<div class="sidebar right">
 		<div class='center'><h2 class='username'></h2><h2> vs. </h2><h2 class='oppenents-username'></h2></div>
@@ -25,6 +23,7 @@
 		var MovePieceURL = "{% url 'chess-app-move-piece' %}";
 		var DragPieceURL = "{% url 'chess-app-drag-piece' %}";
 		var GameStartURL = "{% url 'chess-app-start-game' %}";
+		var GameStopURL = "{% url 'chess-app-stop-game' %}";
 
 	</script>
 	<script>
@@ -90,6 +89,10 @@
 		games[game_id] = game
 		$.post(GameStartURL, {'game_id': game_id}, function(response){console.log('Started Chess Game: ' + game_id);});
 	   }
+
+	   function stopGame(game_id){
+	    $.post(GameStopURL, {'game_id': game_id}, function(response){console.log('Stopped Chess Game: ' + game_id);});
+	   }
 </script>
 	<script>
 		function getConfig(game_id){
@@ -110,6 +113,13 @@
 				super(div_tag, getConfig(game_id));
 				this.game_id = game_id
 				gameStart(this.game_id, this)
+
+				this.reset = function(){
+					stopGame(this.game_id);
+					this.start();
+					$("#sidebar-indicator-text").text('White to move')
+					gameStart(this.game_id, this);
+				}
 			}
 		}
 
@@ -125,7 +135,7 @@
 		board1.position('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R')
 		}
 		function setToStart(){
-		board1.start()
+		board1.reset();
 		}
 	</script>
 </html>
